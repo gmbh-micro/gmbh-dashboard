@@ -83,7 +83,7 @@ function remotes(data) {
         return;
     }
     content.innerHTML =
-        "<h3>Dashboard</h3>\n<h4>Cluser Information</h4>\n";
+        "<h3>Dashboard</h3>\n<h4>Cluster Information</h4>\n";
     // let header = document.createElement('h4');
     // header.innerText = "Cluster Information"
     // content.appendChild(header);
@@ -172,6 +172,9 @@ function timeSince(date) {
     if (interval > 1) {
         result += interval + "m";
         seconds -= interval * 60;
+    }
+    if (result == "") {
+        return "1m";
     }
     return result;
 }

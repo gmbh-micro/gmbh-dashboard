@@ -11,6 +11,10 @@ class Bridge:
     # requestServices queries the cabal server for all attached services
     def requestServices(self):
         channel = grpc.insecure_channel('localhost:49500')
+        try:
+            grpc.channel_ready_future(channel).result(timeout=3)
+        except grpc.FutureTimeoutError:
+            return('Error connecting to server')
         stub = intrigue_pb2_grpc.CabalStub(channel)
         request = intrigue_pb2.Action(
             Request="request.info.all"
@@ -39,6 +43,10 @@ class Bridge:
     # requestRemotes queries the control server for all attached services
     def requestRemotes(self):
         channel = grpc.insecure_channel('localhost:59500')
+        try:
+            grpc.channel_ready_future(channel).result(timeout=3)
+        except grpc.FutureTimeoutError:
+            return('Error connecting to server')
         stub = intrigue_pb2_grpc.ControlStub(channel)
         request = intrigue_pb2.Action(
             Request="summary.all"

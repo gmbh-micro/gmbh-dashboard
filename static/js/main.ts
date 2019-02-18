@@ -114,7 +114,7 @@ function remotes(data: any): void {
     
     content.innerHTML = 
 `<h3>Dashboard</h3>
-<h4>Cluser Information</h4>
+<h4>Cluster Information</h4>
 `;
     // let header = document.createElement('h4');
     // header.innerText = "Cluster Information"
@@ -261,6 +261,9 @@ function timeSince(date) {
     if (interval > 1) {
       result += interval + "m";
       seconds -= interval*60;
+    }
+    if (result == "") {
+        return "1m";
     }
     return result;
   }
