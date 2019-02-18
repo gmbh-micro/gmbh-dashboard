@@ -1,0 +1,118 @@
+body {
+
+}
+
+.content-margin{
+    margin-top: 15px;
+}
+
+.progress {
+    background-color:#f0f0f0;
+}
+
+.collection {
+    border: 0;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.collection a.collection-item{
+    color: #000;
+    font-weight: 100;
+}
+
+.collection a.collection-item.active {
+    color: #000;
+    font-weight: 600;
+}
+
+.nav-padding{
+    margin-top: 121px;
+}
+
+.bb {
+    border:1px solid black;
+}
+
+.remote-header.td, .remote-header.tr{
+    /* padding-top: 0;
+    padding-bottom: 0; */
+}
+
+.service-tbl td, tr, th{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.services-header {
+    line-height: unset;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.remote-header {
+    border: 0;
+    border-collapse: separate;
+}
+
+.remote-title{
+    width: 10em;
+}
+
+.remote-data {
+    padding-top:7px;
+    padding-bottom:0px;
+}
+
+.remote{
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    border-radius: 15px;
+    margin-bottom: 1em;
+    padding: 0 1em 1em 1em;
+}
+
+.paren{
+    font-size: 60px;
+    width: 20px;
+    font-weight: 100;
+}
+
+nav .brand-logo {
+    padding-top: 0.6em;
+}
+
+.rightHeight{
+    height: 76px;
+}
+
+nav {
+    height: 76px;
+    line-height: 76px;
+}
+
+nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
+    height: 76px;
+    line-height: 76px;
+}
+
+nav .button-collapse i {
+    height: 76px;
+    line-height: 76px;
+}
+
+nav .brand-logo { 
+    font-size: 1.6rem; 
+}
+
+@media only screen and (min-width: 601px){
+    nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
+        height: 76px;
+        line-height: 76px;
+    }
+}
