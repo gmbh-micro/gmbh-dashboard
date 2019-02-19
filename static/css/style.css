@@ -116,3 +116,32 @@ nav .brand-logo {
         line-height: 76px;
     }
 }
+
+.material-icons {
+    font-size: 19px;
+}
+
+.single-attrib {
+    font-weight: 700;
+    text-align: right;
+    width: 20%;
+}
+
+.service-title {
+    font-size: 45px;
+    font-weight: 200;
+}
+
+.service-title > span.badge {
+    float:unset;
+    vertical-align: middle;
+}
+
+.modal-content > table {
+    /* border-collapse: separate; */
+}
+.modal-content td {
+    padding-top: 7px;
+    padding-bottom: 7px;
+
+}

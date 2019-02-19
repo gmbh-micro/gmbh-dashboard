@@ -12,7 +12,7 @@ class Bridge:
     def requestServices(self):
         channel = grpc.insecure_channel('localhost:49500')
         try:
-            grpc.channel_ready_future(channel).result(timeout=3)
+            grpc.channel_ready_future(channel).result(timeout=5)
         except grpc.FutureTimeoutError:
             return('Error connecting to server')
         stub = intrigue_pb2_grpc.CabalStub(channel)
@@ -44,7 +44,7 @@ class Bridge:
     def requestRemotes(self):
         channel = grpc.insecure_channel('localhost:59500')
         try:
-            grpc.channel_ready_future(channel).result(timeout=3)
+            grpc.channel_ready_future(channel).result(timeout=5)
         except grpc.FutureTimeoutError:
             return('Error connecting to server')
         stub = intrigue_pb2_grpc.ControlStub(channel)
@@ -65,6 +65,10 @@ class Bridge:
                 data["startTime"] = remote.StartTime
                 data["id"] = remote.ID
                 data["status"] = remote.Status
+                data["errors"] = []
+                for e in remote.Errors:
+                    data["errors"].appen(e)
+                data["logPath"] = remote.LogPath
                 data["services"] = []
                 for service in remote.Services:
                     sdata = {}
@@ -74,8 +78,13 @@ class Bridge:
                     sdata["path"] = service.Path
                     sdata["status"] = service.Status
                     sdata["pid"] = service.Pid
+                    sdata["errors"] = []
+                    for e in service.Errors:
+                        sdata["errors"].append(e)
                     sdata["startTime"] = service.StartTime
                     sdata["failTime"] = service.FailTime
+                    sdata["fails"] = service.Fails
+                    sdata["restarts"] = service.Restarts
                     sdata["logPath"] = service.LogPath
                     sdata["mode"] = service.Mode
                     data["services"].append(sdata)
@@ -84,6 +93,3 @@ class Bridge:
             return(json.dumps(ret))
         except grpc.RpcError as e:
             return "could not contact server"
-
-        # print(response.Remotes)
-

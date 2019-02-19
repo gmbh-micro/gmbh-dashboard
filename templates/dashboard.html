@@ -2,6 +2,7 @@
 
 </head>
     <title>gmbH-micro dashboard</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='materialize/css/materialize.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -10,34 +11,39 @@
 <nav>
   <div class="nav-wrapper navheight grey darken-3">
     <div class="container">
+      <div class="row">
+      <div class="col s12">
       <a href="#" class="brand-logo"><img src="{{ url_for('static', filename='img/logo_white.png') }}" width="75%"></a>
       <ul id="nav-mobile" class="right hide-on-med-and-down rightHeight">
         <li><a href="/dashboard">Dashboard</a></li>
         <li><a href="/">Home</a></li>
       </ul>
       </div>
+      </div>
+      </div>
   </div>
 </nav>
 
 <div class="container content-margin" id="container">
   <div class="row">
-    <div class="col s3 nav-border" id="nav-bar">
+    <div class="col l9 m12 s12" id="main-content">
     </div>
-    <div class="col s9" id="main-content">
+    <div class="col l3 m12 s12 nav-border" id="nav-bar">
     </div>
+    
   </div>
 </div>
 
-        <footer class="page-footer white">
-          <div class="footer-copyright">
-            <div class="container">
-            <span class="black-text right">© 2018 the gmbh-micro team</span>
-            </div>
-          </div>
-        </footer>
+<footer class="page-footer white">
+  <div class="footer-copyright">
+    <div class="container">
+    <span class="black-text right">© 2018 the gmbh-micro team</span>
+    </div>
+  </div>
+</footer>
 
-<script type="text/javascript" src="{{ url_for('static', filename='materialize/js/materialize.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='materialize/js/materialize.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 </body>

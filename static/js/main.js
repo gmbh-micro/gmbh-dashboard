@@ -1,14 +1,18 @@
 "use strict";
 console.log("start");
+$(document).ready(function () {
+    // $('.collapsible').collapsible();
+    setDashboard();
+    retrieveData();
+    buildNav();
+    M.AutoInit();
+});
 var container = document.getElementById("container");
 // let content = document.getElementById("main-content");  
 var nav = document.getElementById("nav-bar");
 // @ts-ignore
 var parsedServices;
 var parsedRemotes;
-setDashboard();
-retrieveData();
-buildNav();
 function getAddress() {
 }
 function buildNav() {
@@ -75,23 +79,16 @@ function remotes(data) {
     }
     catch (_a) {
         console.log("could not parse results");
-        // let header = document.createElement('h5');
-        // header.innerText = "could not contact gmbh";
-        // content.appendChild(header);    
         content.innerHTML =
-            "\n<h3>Dashboard</h3>\n<h5>could not reach gmbh</h5>\n";
+            "<h3>Dashboard</h3>\n<h5>could not reach gmbh</h5>\n";
         return;
     }
     content.innerHTML =
         "<h3>Dashboard</h3>\n<h4>Cluster Information</h4>\n";
-    // let header = document.createElement('h4');
-    // header.innerText = "Cluster Information"
-    // content.appendChild(header);
     var cluster = document.createElement("div");
     cluster.id = "cluster";
     for (var remote in parsedRemotes) {
         var r = parsedRemotes[remote];
-        // console.log(r);
         var remoteDiv = document.createElement("div");
         remoteDiv.id = "remote-" + r.id;
         remoteDiv.className = "remote";
@@ -110,7 +107,7 @@ function remotes(data) {
             remoteDiv.appendChild(table);
             var header = document.createElement('thead');
             header.innerHTML =
-                "<thead>\n    <th>Name</td>\n    <th>ID</td>\n    <th>PID</td>\n    <th>Address</td>\n    <th>Upime</td>\n    <th>Mode</td>\n    <!--<th>Fail Time</td>\n    <th>Log Path</td>\n    <th>Path</td>-->\n</thead>\n";
+                "<thead>\n    <th>Name</td>\n    <th>ID</td>\n    <th class=\"center-align\">Info</td>\n    <th>PID</td>\n    <th>Address</td>\n    <th>Upime</td>\n    <th>Mode</td>\n    <th class=\"center-align\">Restart</td>\n    <!--<th>Fail Time</td>\n    <th>Log Path</td>\n    <th>Path</td>-->\n</thead>\n";
             table.appendChild(header);
             for (var service in r.services) {
                 var s = r.services[service];
@@ -124,19 +121,44 @@ function remotes(data) {
                 }
                 var status_1 = "<span class=\"new badge " + color + "\" data-badge-caption=\"\">" + s.status + "</span>";
                 var cabalService = getService(r.id);
+                s.gmbhService = cabalService;
+                console.log(s);
                 var addr = "-";
                 if (cabalService != null) {
                     addr = cabalService.address;
                 }
+                var icolor = "blue-text";
+                if (s.errors.length != 0) {
+                    icolor = "red-text";
+                }
+                if (s.pid == -1) {
+                    s.startTime = "0";
+                }
                 var row = document.createElement('tr');
                 row.innerHTML =
-                    "<td>" + s.name + "&nbsp;" + status_1 + "</td>\n<td>" + id + "</td>\n<td>" + s.pid + "</td>\n<td>" + addr + "</td>\n<td>" + timeSince(Date.parse(s.startTime)) + "</td>\n<td>" + s.mode + "</td>\n<!--<td>" + s.failTime + "</td>\n<td>" + s.logPath + "</td>\n<td>" + s.path + "</td>-->";
+                    "<td>" + s.name + "&nbsp;" + status_1 + "</td>\n<td>" + id + "</td>\n<td class=\"center-align\"><a class=\"modal-trigger\" href=\"#modal-" + s.id + "\"><i class=\"material-icons " + icolor + "\">info_outline</i></a></td>\n<td>" + s.pid + "</td>\n<td>" + addr + "</td>\n<td>" + timeSince(Date.parse(s.startTime)) + "</td>\n<td>" + s.mode + "</td>\n<td class=\"center-align\"><a href=\"#\"><i class=\"material-icons\">cached</i></a></td>\n<!--<td>" + s.failTime + "</td>\n<td>" + s.logPath + "</td>\n<td>" + s.path + "</td>-->";
                 table.appendChild(row);
+                var modal = generateModal("-" + s.id);
+                remoteDiv.appendChild(modal);
+                $(modal).modal();
+                var errorString = "-";
+                if (s.errors.length != 0) {
+                    errorString = "<table>";
+                    for (var e in s.errors) {
+                        errorString += "<tr><td>" + s.errors[e] + " </td></tr>";
+                    }
+                    errorString += "</table>";
+                }
+                var mcontent = document.createElement('div');
+                mcontent.className = "modal-content";
+                mcontent.innerHTML =
+                    "<span class=\"service-title\">" + s.name + "<span class=\"new badge " + color + "\" data-badge-caption=\"\">" + s.status + "</span></span>\n<a class=\"modal-close\" href=\"#modal-" + s.id + "\"><i class=\"small right material-icons\">close</i></a>\n<table>\n    <tr>\n        <td class=\"single-attrib\">ID</td>\n        <td>" + id + "</td>\n    </tr>\n    <tr>\n        <td class=\"single-attrib\">Parent ID</td>\n        <td>" + r.id + "</td>\n    </tr>\n    <tr>\n        <td class=\"single-attrib\">PID</td>\n        <td>" + s.pid + "</td>\n    </tr>\n    <tr>\n        <td class=\"single-attrib\">Address</td>\n        <td>" + addr + "</td>\n    </tr>\n    <tr>\n        <td class=\"single-attrib\">Uptime</td>\n        <td>" + timeSince(Date.parse(s.startTime)) + "</td>\n    </tr>\n    <tr>\n        <td class=\"single-attrib\">Restarts</td>\n        <td>" + s.restarts + "</td>\n    </tr>\n    <tr>\n        <td class=\"single-attrib\">Fails</td>\n        <td>" + s.fails + "</td>\n    </tr>\n    <tr>\n        <td class=\"single-attrib\">Log Path</td>\n        <td>" + s.logPath + "</td>\n    </tr>\n    <tr>\n        <td class=\"single-attrib\">Warnings</td>\n        <td><span class=\"yellow-text\">-</span></td>\n    </tr>\n    <tr>\n        <td class=\"single-attrib\">Errors</td>\n        <td><span class=\"red-text\">" + errorString + "</span></td>\n    </tr>\n";
+                modal.appendChild(mcontent);
             }
         }
-        cluster.append(remoteDiv);
+        cluster.appendChild(remoteDiv);
     }
-    content.append(cluster);
+    content.appendChild(cluster);
 }
 function setDashboard() {
     var content = document.getElementById("main-content");
@@ -150,6 +172,9 @@ function setDashboard() {
 // Sky Sanders, stackoverflow; July 5, 2010
 // @ts-ignore
 function timeSince(date) {
+    if (date == "0") {
+        return "-";
+    }
     // @ts-ignore
     var seconds = Math.floor((new Date() - date) / 1000);
     if (seconds < 60) {
@@ -159,17 +184,17 @@ function timeSince(date) {
     var result = "";
     interval = Math.floor(seconds / 2592000);
     interval = Math.floor(seconds / 86400);
-    if (interval > 1) {
+    if (interval >= 1) {
         result += interval + "d";
         seconds -= interval * 86400;
     }
     interval = Math.floor(seconds / 3600);
-    if (interval > 1) {
+    if (interval >= 1) {
         result += interval + "h";
         seconds -= interval * 3600;
     }
     interval = Math.floor(seconds / 60);
-    if (interval > 1) {
+    if (interval >= 1) {
         result += interval + "m";
         seconds -= interval * 60;
     }
@@ -177,4 +202,17 @@ function timeSince(date) {
         return "1m";
     }
     return result;
+}
+function generateModal(id) {
+    var outterdiv = document.createElement('div');
+    outterdiv.id = "modal" + id;
+    outterdiv.className = "modal";
+    return outterdiv;
+}
+function genLink(id) {
+    var link = document.createElement('a');
+    link.setAttribute("href", "#modal" + id);
+    link.className = "waves-effect waves-light btn modal-trigger";
+    link.innerText = 'Modal';
+    return link;
 }

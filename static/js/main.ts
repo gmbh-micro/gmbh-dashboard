@@ -1,5 +1,12 @@
 console.log("start")
 
+$(document).ready(function(){
+    // $('.collapsible').collapsible();
+    setDashboard();
+    retrieveData();
+    buildNav();
+    M.AutoInit();
+});
 
 let container = document.getElementById("container");
 // let content = document.getElementById("main-content");  
@@ -9,10 +16,6 @@ let nav = document.getElementById("nav-bar")
 let parsedServices;
 let parsedRemotes;
 
-
-setDashboard();
-retrieveData();
-buildNav();
 
 function getAddress(){
 
@@ -37,6 +40,7 @@ function buildNav(){
 </div>
 `;
 }
+
 
 function retrieveData(): void{
     // @ts-ignore
@@ -96,17 +100,12 @@ function remotes(data: any): void {
         return;
     }
 
-
     try {
         parsedRemotes = JSON.parse(data);
     } catch {
-        console.log("could not parse results");
-        // let header = document.createElement('h5');
-        // header.innerText = "could not contact gmbh";
-        // content.appendChild(header);    
+        console.log("could not parse results");  
         content.innerHTML = 
-`
-<h3>Dashboard</h3>
+`<h3>Dashboard</h3>
 <h5>could not reach gmbh</h5>
 `;
         return;
@@ -116,9 +115,6 @@ function remotes(data: any): void {
 `<h3>Dashboard</h3>
 <h4>Cluster Information</h4>
 `;
-    // let header = document.createElement('h4');
-    // header.innerText = "Cluster Information"
-    // content.appendChild(header);
 
     let cluster = document.createElement("div")
     cluster.id = "cluster";
@@ -127,7 +123,6 @@ function remotes(data: any): void {
 
         let r = parsedRemotes[remote];
 
-        // console.log(r);
         let remoteDiv = document.createElement("div");
         remoteDiv.id = "remote-"+r.id;
         remoteDiv.className = "remote";
@@ -167,10 +162,12 @@ remoteDiv.innerHTML =
 `<thead>
     <th>Name</td>
     <th>ID</td>
+    <th class="center-align">Info</td>
     <th>PID</td>
     <th>Address</td>
     <th>Upime</td>
     <th>Mode</td>
+    <th class="center-align">Restart</td>
     <!--<th>Fail Time</td>
     <th>Log Path</td>
     <th>Path</td>-->
@@ -193,38 +190,112 @@ remoteDiv.innerHTML =
             let status = `<span class="new badge ${color}" data-badge-caption="">${s.status}</span>`
 
             let cabalService = getService(r.id);
+            s.gmbhService = cabalService;
+            console.log(s);
             let addr = "-";
             if (cabalService != null) {
                 addr = cabalService.address;
+            }
+            let icolor = "blue-text";
+            if (s.errors.length != 0) {
+                icolor = "red-text"
+            }
+
+            if (s.pid == -1) {
+                s.startTime = "0";
             }
 
             let row = document.createElement('tr');
             row.innerHTML = 
 `<td>${s.name}&nbsp;${status}</td>
 <td>${id}</td>
+<td class="center-align"><a class="modal-trigger" href="#modal-${s.id}"><i class="material-icons ${icolor}">info_outline</i></a></td>
 <td>${s.pid}</td>
 <td>${addr}</td>
 <td>${timeSince(Date.parse(s.startTime))}</td>
 <td>${s.mode}</td>
+<td class="center-align"><a href="#"><i class="material-icons">cached</i></a></td>
 <!--<td>${s.failTime}</td>
 <td>${s.logPath}</td>
 <td>${s.path}</td>-->`;
             table.appendChild(row);
+
+            let modal = generateModal("-"+s.id);
+            remoteDiv.appendChild(modal);
+            $(modal).modal();
+
+            let errorString = "-";
+            if (s.errors.length != 0) {
+
+                errorString = "<table>";
+                for(let e in s.errors){
+                    errorString += "<tr><td>" + s.errors[e] + " </td></tr>";
+                }
+                errorString += "</table>"
+            }
+
+            let mcontent = document.createElement('div');
+            mcontent.className="modal-content";
+mcontent.innerHTML =
+`<span class="service-title">${s.name}<span class="new badge ${color}" data-badge-caption="">${s.status}</span></span>
+<a class="modal-close" href="#modal-${s.id}"><i class="small right material-icons">close</i></a>
+<table>
+    <tr>
+        <td class="single-attrib">ID</td>
+        <td>${id}</td>
+    </tr>
+    <tr>
+        <td class="single-attrib">Parent ID</td>
+        <td>${r.id}</td>
+    </tr>
+    <tr>
+        <td class="single-attrib">PID</td>
+        <td>${s.pid}</td>
+    </tr>
+    <tr>
+        <td class="single-attrib">Address</td>
+        <td>${addr}</td>
+    </tr>
+    <tr>
+        <td class="single-attrib">Uptime</td>
+        <td>${timeSince(Date.parse(s.startTime))}</td>
+    </tr>
+    <tr>
+        <td class="single-attrib">Restarts</td>
+        <td>${s.restarts}</td>
+    </tr>
+    <tr>
+        <td class="single-attrib">Fails</td>
+        <td>${s.fails}</td>
+    </tr>
+    <tr>
+        <td class="single-attrib">Log Path</td>
+        <td>${s.logPath}</td>
+    </tr>
+    <tr>
+        <td class="single-attrib">Warnings</td>
+        <td><span class="yellow-text">-</span></td>
+    </tr>
+    <tr>
+        <td class="single-attrib">Errors</td>
+        <td><span class="red-text">${errorString}</span></td>
+    </tr>
+`;
+            modal.appendChild(mcontent);
         }
+        
     }
-        cluster.append(remoteDiv);
-    }
-    content.append(cluster);
+    cluster.appendChild(remoteDiv);
+}
+    content.appendChild(cluster);
 }
 
 function setDashboard(): void{
-    
     let content = document.getElementById("main-content");
     if (content == null) {
         console.log("error=could not get main-content div")
         return;
     }  
-
 content.innerHTML =
 `<h3>Dashboard</h3>
 <h5>contacting gmbh</h5>
@@ -232,13 +303,15 @@ content.innerHTML =
       <div class="indeterminate grey darken-3"></div>
   </div>
 `;
-
 }
 
 
 // Sky Sanders, stackoverflow; July 5, 2010
 // @ts-ignore
 function timeSince(date) {
+    if (date == "0") {
+        return "-"
+    }
     // @ts-ignore
     var seconds = Math.floor((new Date() - date) / 1000);
     if (seconds < 60) {
@@ -248,17 +321,17 @@ function timeSince(date) {
     let result = "";
     interval = Math.floor(seconds / 2592000);
     interval = Math.floor(seconds / 86400);
-    if (interval > 1) {
+    if (interval >= 1) {
       result += interval + "d";
       seconds -= interval*86400;
     }
     interval = Math.floor(seconds / 3600);
-    if (interval > 1) {
+    if (interval >= 1) {
       result += interval + "h";
       seconds -= interval*3600;
     }
     interval = Math.floor(seconds / 60);
-    if (interval > 1) {
+    if (interval >= 1) {
       result += interval + "m";
       seconds -= interval*60;
     }
@@ -267,3 +340,18 @@ function timeSince(date) {
     }
     return result;
   }
+
+function generateModal(id: string){
+    let outterdiv = document.createElement('div');
+    outterdiv.id="modal"+id;
+    outterdiv.className="modal";
+    return outterdiv;    
+}
+
+function genLink(id: string){
+    let link = document.createElement('a');
+    link.setAttribute("href","#modal"+id);
+    link.className="waves-effect waves-light btn modal-trigger";
+    link.innerText = 'Modal';
+    return link
+}
