@@ -93,3 +93,46 @@ class Bridge:
             return(json.dumps(ret))
         except grpc.RpcError as e:
             return "could not contact server"
+
+    def restart(self):
+        channel = grpc.insecure_channel('localhost:59500')
+        try:
+            grpc.channel_ready_future(channel).result(timeout=5)
+        except grpc.FutureTimeoutError:
+            return('Error connecting to server')
+        stub = intrigue_pb2_grpc.ControlStub(channel)
+        request = intrigue_pb2.Action(
+            Request="restart.all"
+        )
+        try:
+            response = stub.RestartService(request)
+            if response.Error != "":
+                print(response.Error)
+                return("failure")
+
+            return response.Message
+        except grpc.RpcError:
+            return "could not contact server"
+
+    def restart_one(self, parentid: str, id: str):
+        channel = grpc.insecure_channel('localhost:59500')
+        try:
+            grpc.channel_ready_future(channel).result(timeout=5)
+        except grpc.FutureTimeoutError:
+            return('Error connecting to server')
+        stub = intrigue_pb2_grpc.ControlStub(channel)
+
+        request = intrigue_pb2.Action(
+            Request="restart.one",
+            RemoteID=parentid,
+            Target=id,
+        )
+        try:
+            response = stub.RestartService(request)
+            if response.Error != "":
+                print(response.Error)
+                return("failure")
+
+            return response.Message
+        except grpc.RpcError:
+            return "could not contact server"

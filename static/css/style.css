@@ -10,6 +10,12 @@ body {
     background-color:#f0f0f0;
 }
 
+.info {
+    padding-left: 10px;
+    padding-right: 10px;
+
+}
+
 .collection {
     border: 0;
     border-top: 1px solid black;
@@ -61,7 +67,7 @@ body {
 }
 
 .remote-title{
-    width: 10em;
+    width: 12em;
 }
 
 .remote-data {
