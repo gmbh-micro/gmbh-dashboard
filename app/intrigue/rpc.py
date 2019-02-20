@@ -9,8 +9,8 @@ import intrigue.intrigue_pb2_grpc as intrigue_pb2_grpc
 class Bridge:
 
     # requestServices queries the cabal server for all attached services
-    def requestServices(self):
-        channel = grpc.insecure_channel('localhost:49500')
+    def requestServices(self, addr: str):
+        channel = grpc.insecure_channel(addr)
         try:
             grpc.channel_ready_future(channel).result(timeout=5)
         except grpc.FutureTimeoutError:
@@ -41,8 +41,11 @@ class Bridge:
 
 
     # requestRemotes queries the control server for all attached services
-    def requestRemotes(self):
-        channel = grpc.insecure_channel('localhost:59500')
+    def requestRemotes(self, addr: str):
+        if addr == "":
+            return "invalid address"
+
+        channel = grpc.insecure_channel(addr)
         try:
             grpc.channel_ready_future(channel).result(timeout=5)
         except grpc.FutureTimeoutError:
@@ -94,8 +97,32 @@ class Bridge:
         except grpc.RpcError as e:
             return "could not contact server"
 
-    def restart(self):
-        channel = grpc.insecure_channel('localhost:59500')
+    def shutdown(self, addr: str):
+        if addr == "":
+            return "invalid address"
+
+        channel = grpc.insecure_channel(addr)
+        try:
+            grpc.channel_ready_future(channel).result(timeout=5)
+        except grpc.FutureTimeoutError:
+            return('Error connecting to server')
+        stub = intrigue_pb2_grpc.ControlStub(channel)
+        request = intrigue_pb2.EmptyRequest()
+        try:
+            response = stub.StopServer(request)
+            if response.Error != "":
+                print(response.Error)
+                return("failure")
+
+            return response.Message
+        except grpc.RpcError:
+            return "could not contact server"
+
+    def restart(self, addr: str):
+        if addr == "":
+            return "invalid address"
+
+        channel = grpc.insecure_channel(addr)
         try:
             grpc.channel_ready_future(channel).result(timeout=5)
         except grpc.FutureTimeoutError:
@@ -114,8 +141,8 @@ class Bridge:
         except grpc.RpcError:
             return "could not contact server"
 
-    def restart_one(self, parentid: str, id: str):
-        channel = grpc.insecure_channel('localhost:59500')
+    def restart_one(self, parentid: str, id: str, addr: str):
+        channel = grpc.insecure_channel(addr)
         try:
             grpc.channel_ready_future(channel).result(timeout=5)
         except grpc.FutureTimeoutError:

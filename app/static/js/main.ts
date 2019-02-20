@@ -1,23 +1,98 @@
-// console.log("start")
-
-$(document).ready(function () {
-    // $('.collapsible').collapsible();
-    setDashboard();
-    retrieveData();
-    M.AutoInit();
-});
 
 let container = document.getElementById("container");
-// let content = document.getElementById("main-content");  
 let nav = document.getElementById("nav-bar")
 
 // @ts-ignore
 let parsedServices;
 let parsedRemotes;
 
+let cabalServer:string = Cookies.get("cbl");
+let controlServer:string = Cookies.get("ctrl");
+
+$(document).ready(function () {
+
+    M.AutoInit();
+
+    setDashboard();
+    if (cabalServer == undefined || controlServer == undefined) {
+        console.log("get addresses");
+        let amodal = getAddress()
+        var instance = M.Modal.getInstance(amodal);
+        instance.open();
+    } else {
+        getAddress();
+        console.log(cabalServer, controlServer);
+        retrieveData(cabalServer, controlServer);
+    }    
+
+});    
+
+
+
 
 function getAddress() {
+    let addrModal = generateModal("-addr");
+    $(addrModal).modal();
+    let c = document.getElementById("container");
+    c.appendChild(addrModal);
 
+
+    if (cabalServer == undefined) {
+        cabalServer = "localhost:49500";
+    }
+    if (controlServer == undefined) {
+        controlServer = "localhost:59500";
+    }
+
+    let addrContent = document.createElement('div');
+    addrContent.className = "modal-content";
+    addrContent.innerHTML = `
+<a class="modal-close" href="#modal-addr"><i class="small right material-icons">close</i></a>
+<h4>Set Addresses</h4>
+<div class="row">
+    <div class="input-field col s12">
+        <input value="${controlServer}" id="CtrlServer" type="text">
+        <label class="active" for="CabalServer">Control Server</label>
+    </div>
+</div>
+<div class="row">
+    <div class="input-field col s12">
+        <input value="${cabalServer}" id="CblServer" type="text">
+        <label class="active" for="CblServer">Cabal Server</label>
+    </div>
+</div>
+`;
+let chadr = document.createElement('a');
+chadr.className = "waves-effect waves-light btn-small grey darken-2";
+chadr.innerText = "Change";
+addrContent.append(chadr);
+
+$(chadr).click(()=>{
+    setDashboard();
+
+    let clb = $('#CblServer').val();
+    let ctrl = $('#CtrlServer').val()
+
+    if (clb == "" || ctrl == ""){
+        M.toast({html: 'Server URL\'s cannot be empty'});
+
+    } else {
+
+        retrieveData(clb,ctrl);
+
+        cabalServer = clb;
+        controlServer = ctrl;
+
+        Cookies.set('cbl',clb);
+        Cookies.set('ctrl',ctrl);
+
+        var instance = M.Modal.getInstance(addrModal);
+        instance.close();
+    }
+});
+
+addrModal.appendChild(addrContent);
+    return addrModal;
 }
 
 function buildNav() {
@@ -33,7 +108,7 @@ function buildNav() {
         <a href="#!" id="restart-all" class="collection-item">Restart All</a>
         <a href="#!" id="shutdown" class="collection-item">Shutdown</a>
         <a href="#!" id="reload" class="collection-item">Reload</a>
-        <a href="#!" id="change-addresses" class="collection-item">Change Addresses</a>
+        <a class="collection-item modal-trigger" href="#modal-addr" id="change-addresses" class="collection-item">Change Addresses</a>
     </div>
     `;
 
@@ -42,25 +117,26 @@ function buildNav() {
         $.ajax({
             url: "/api/restart_all",
             method: 'POST',
+            data: controlServer,
             success: (data)=>{
                 console.log("data " + data);
                 parsedServices = [];
                 parsedRemotes = [];
                 setDashboard();
-                retrieveData();
+                retrieveData(cabalServer,controlServer);
             },
             error: ()=>{
                 M.toast({html: 'Issue restarting gmbH.'});
             },
         });
         
-        // console.log("restart-all");
-    })
+    });
     $('#shutdown').click(()=>{
         console.log("shutdown");
         $.ajax({
             url: "/api/shutdown",
             method: 'POST',
+            data: controlServer,
             success: (data)=>{
                 console.log("data " + data);
                 M.toast({html: 'Sent shutdown notif'});
@@ -69,26 +145,23 @@ function buildNav() {
                 M.toast({html: 'Issue sending shutdown to gmbH.'});
             },
         });
-    })
+    });
     $('#reload').click(()=>{
         M.toast({html: 'Reloading'});
         parsedServices = [];
         parsedRemotes = [];
         setDashboard();
-        retrieveData();
-    })
-    $('#change-addresses').click(()=>{
-        console.log("unimp");
-    })
-    
+        retrieveData(cabalServer,controlServer);
+    });    
 }
 
 
-function retrieveData(): void {
+function retrieveData(cabal:string,control:string): void {
     // @ts-ignore
     $.ajax({
         url: "/api/get_services",
         method: 'POST',
+        data: cabal,
         success: (data: any) => {
             // console.log(data);
             try {
@@ -98,6 +171,7 @@ function retrieveData(): void {
             }
             $.ajax({
                 url: "/api/get_remotes",
+                data: control,
                 method: 'POST',
                 success: remotes,
                 error: gmbherror,
@@ -116,8 +190,10 @@ function gmbherror() {
         return;
     }
     content.innerHTML =
-        `<h3>Dashboard</h3>
+    `<h3>Dashboard</h3>
     <h5>could not reach gmbh</h5>
+    <br>
+    <a class="collection-item modal-trigger" href="#modal-addr" id="change-addresses" class="collection-item">Change Addresses</a>
     `;
 }
 
@@ -147,9 +223,12 @@ function remotes(data: any): void {
     } catch {
         console.log("could not parse results");
         content.innerHTML =
-            `<h3>Dashboard</h3>
+        `<h3>Dashboard</h3>
         <h5>could not reach gmbh</h5>
+        <br>
+        <a class="collection-item modal-trigger" href="#modal-addr" id="change-addresses" class="collection-item">Change Addresses</a>
         `;
+
         return;
     }
 
@@ -349,13 +428,13 @@ function genServiceRow(r, s) {
         $.ajax({
             url: "/api/restart_one",
             method: 'POST',
-            data: s.id,
+            data: s.id + "%" + controlServer,
             success: (data)=>{
                 // console.log("data " + data);
                 parsedServices = [];
                 parsedRemotes = [];
                 setDashboard();
-                retrieveData();
+                retrieveData(cabalServer,controlServer);
             },
             error: ()=>{
                 M.toast({html: 'Issue restarting ' + s.id});
@@ -523,3 +602,19 @@ function genModalService(r, s, id: string, color: string, addr: string) {
     return modal;
 }
 
+// from w3c
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }

@@ -1,6 +1,17 @@
 # gmbh-dashboard
 
+A browser based app to visualize and manage gmbh-micro clusters.
 
-`sudo python -m pip install grpcio`
-`sudo python -m pip install grpcio-tools`
-`python -m grpc_tools.protoc -I./intrigue --python_out=. --grpc_python_out=. ./intrigue/intrigue.proto`
+### To Run
+
+Install dependencies with  `pip install -r requirements`
+And then from this directroy run `./scripts/startServer.sh`
+
+The dashboard, by default, will be started at: http://0.0.0.0:5000
+
+
+### Bulding the Docker image
+~~Use the shell scripts to build, start and stop the image and container.~~
+...not yet working.
+
+***This tool is intended to be used internally.***
