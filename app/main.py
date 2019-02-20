@@ -65,7 +65,7 @@ def shutdown():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=False, port=5001)
 # if __name__ == '__main__':
 #     parser = optparse.OptionParser(usage="python3 app.py -p ")
 #     parser.add_option('-p', '--port', action='store', dest='port', help='The port to listen on.')
