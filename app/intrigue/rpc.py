@@ -156,6 +156,7 @@ class Bridge:
         )
         try:
             response = stub.RestartService(request)
+            print(response)
             if response.Error != "":
                 print(response.Error)
                 return("failure")

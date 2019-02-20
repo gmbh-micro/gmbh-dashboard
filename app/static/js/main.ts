@@ -1,4 +1,6 @@
 
+const version = "1.0.0";
+
 let container = document.getElementById("container");
 let nav = document.getElementById("nav-bar")
 

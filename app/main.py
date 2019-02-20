@@ -36,7 +36,7 @@ def restart_one():
     # get the address
     addrSplit = data.split('%')
 
-    if len(addrSplit[0]) != 2:
+    if len(addrSplit) != 2:
         return "error parsing control server address"
 
     # Split the id into two parts
@@ -65,7 +65,7 @@ def shutdown():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=False, port=5001)
+    app.run(host='0.0.0.0', debug=True, port=5001)
 # if __name__ == '__main__':
 #     parser = optparse.OptionParser(usage="python3 app.py -p ")
 #     parser.add_option('-p', '--port', action='store', dest='port', help='The port to listen on.')
