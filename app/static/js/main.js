@@ -1,4 +1,5 @@
 "use strict";
+var version = "1.0.0";
 var container = document.getElementById("container");
 var nav = document.getElementById("nav-bar");
 // @ts-ignore
@@ -264,6 +265,7 @@ function genLink(id) {
 // genServiceRow
 // generates a row in the service table including the modal printout
 function genServiceRow(r, s) {
+    console.log(r, s);
     var id = s.id;
     if (id.length > 4) {
         id = id.substring(5);
@@ -288,7 +290,7 @@ function genServiceRow(r, s) {
     }
     var row = document.createElement('tr');
     row.innerHTML =
-        "<td>" + s.name + "&nbsp;" + status + "</td>\n        <td>" + id + "</td>\n        <td class=\"center-align\"><a class=\"modal-trigger\" href=\"#modal-" + s.id + "\"><i class=\"material-icons " + icolor + "\">info_outline</i></a></td>\n        <td>" + s.pid + "</td>\n        <td>" + addr + "</td>\n        <td>" + timeSince(Date.parse(s.startTime)) + "</td>\n        <td>" + s.mode + "</td>\n        <!--<td>" + s.failTime + "</td>\n        <td>" + s.logPath + "</td>\n        <td>" + s.path + "</td>-->";
+        "<td>" + s.gmbhService.name + "&nbsp;" + status + "</td>\n        <td>" + id + "</td>\n        <td class=\"center-align\"><a class=\"modal-trigger\" href=\"#modal-" + s.id + "\"><i class=\"material-icons " + icolor + "\">info_outline</i></a></td>\n        <td>" + s.pid + "</td>\n        <td>" + addr + "</td>\n        <td>" + timeSince(Date.parse(s.startTime)) + "</td>\n        <td>" + s.mode + "</td>\n        <!--<td>" + s.failTime + "</td>\n        <td>" + s.logPath + "</td>\n        <td>" + s.path + "</td>-->";
     row.appendChild(genModalService(r, s, id, color, addr));
     var td = document.createElement('td');
     td.className = "center-align";

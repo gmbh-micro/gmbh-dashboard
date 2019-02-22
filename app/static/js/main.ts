@@ -29,9 +29,6 @@ $(document).ready(function () {
 
 });    
 
-
-
-
 function getAddress() {
     let addrModal = generateModal("-addr");
     $(addrModal).modal();
@@ -314,7 +311,6 @@ function setDashboard(): void {
     `;
 }
 
-
 // Sky Sanders, stackoverflow; July 5, 2010
 // @ts-ignore
 function timeSince(date) {
@@ -371,6 +367,7 @@ function genLink(id: string) {
 // generates a row in the service table including the modal printout
 function genServiceRow(r, s) {
 
+    console.log(r,s);
 
     let id = s.id
     if (id.length > 4) {
@@ -401,7 +398,7 @@ function genServiceRow(r, s) {
 
     let row = document.createElement('tr');
     row.innerHTML =
-        `<td>${s.name}&nbsp;${status}</td>
+        `<td>${s.gmbhService.name}&nbsp;${status}</td>
         <td>${id}</td>
         <td class="center-align"><a class="modal-trigger" href="#modal-${s.id}"><i class="material-icons ${icolor}">info_outline</i></a></td>
         <td>${s.pid}</td>
