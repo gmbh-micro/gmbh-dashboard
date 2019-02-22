@@ -4,7 +4,7 @@ A browser based app to visualize and manage gmbh-micro clusters.
 
 ### To Run
 
-Install dependencies with  `pip install -r requirements`
+Install dependencies with  `pip install -r requirements.txt`
 And then from this directroy run `./scripts/startServer.sh`
 
 The dashboard, by default, will be started at: http://0.0.0.0:5001
@@ -20,3 +20,6 @@ Notes about the Docker version
 * On linux you will need to run `ip a` to figure out what the host name will be
 
 ***This tool is intended to be used internally.***
+
+
+![screenshot](https://raw.githubusercontent.com/gmbh-micro/gmbh-dashboard/master/app/static/img/screen_shot.png)
