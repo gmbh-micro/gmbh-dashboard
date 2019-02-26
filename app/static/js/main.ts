@@ -367,7 +367,7 @@ function genLink(id: string) {
 // generates a row in the service table including the modal printout
 function genServiceRow(r, s) {
 
-    console.log(r,s);
+    console.log(s);
 
     let id = s.id
     if (id.length > 4) {
@@ -396,9 +396,14 @@ function genServiceRow(r, s) {
         s.startTime = "0";
     }
 
+    let name = ""
+    if (s.gmbhService != undefined){
+        name = s.gmbhService.name;
+    }
+
     let row = document.createElement('tr');
     row.innerHTML =
-        `<td>${s.gmbhService.name}&nbsp;${status}</td>
+        `<td>${name}&nbsp;${status}</td>
         <td>${id}</td>
         <td class="center-align"><a class="modal-trigger" href="#modal-${s.id}"><i class="material-icons ${icolor}">info_outline</i></a></td>
         <td>${s.pid}</td>
