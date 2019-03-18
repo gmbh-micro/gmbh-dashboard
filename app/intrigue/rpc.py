@@ -32,6 +32,7 @@ class Bridge:
                 data["name"] = service.Name
                 data["address"] = service.Address
                 data["mode"] = service.Mode
+                data["groupName"] = service.GroupName
                 data["parentID"] = service.ParentID
                 ret.append(data)
 

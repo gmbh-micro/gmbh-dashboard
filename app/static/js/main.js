@@ -194,7 +194,7 @@ function remotes(data) {
             remoteDiv.appendChild(table);
             var header = document.createElement('thead');
             header.innerHTML =
-                "<thead>\n                    <th>Name</td>\n                    <th>ID</td>\n                    <th class=\"center-align\">Info</td>\n                    <th>PID</td>\n                    <th>Address</td>\n                    <th>Upime</td>\n                    <th>Mode</td>\n                    <th class=\"center-align\">Restart</td>\n                    <!--<th>Fail Time</td>\n                    <th>Log Path</td>\n                    <th>Path</td>-->\n                </thead>\n                ";
+                "<thead>\n                    <th>Name</td>\n                    <th>ID</td>\n                    <th class=\"center-align\">Info</td>\n                    <th>PID</td>\n                    <th>Address</td>\n                    <th>Upime</td>\n                    <th>Mode</td>\n                    <th>Group</td>\n                    <th class=\"center-align\">Restart</td>\n                    <!--<th>Fail Time</td>\n                    <th>Log Path</td>\n                    <th>Path</td>-->\n                </thead>\n                ";
             table.appendChild(header);
             for (var service in r.services) {
                 var s = r.services[service];
@@ -292,9 +292,16 @@ function genServiceRow(r, s) {
     if (s.gmbhService != undefined) {
         name = s.gmbhService.name;
     }
+    var gname = "-";
+    if (s.gmbhService != undefined) {
+        gname = s.gmbhService.groupName;
+        if (gname == "") {
+            gname = "-";
+        }
+    }
     var row = document.createElement('tr');
     row.innerHTML =
-        "<td>" + name + "&nbsp;" + status + "</td>\n        <td>" + id + "</td>\n        <td class=\"center-align\"><a class=\"modal-trigger\" href=\"#modal-" + s.id + "\"><i class=\"material-icons " + icolor + "\">info_outline</i></a></td>\n        <td>" + s.pid + "</td>\n        <td>" + addr + "</td>\n        <td>" + timeSince(Date.parse(s.startTime)) + "</td>\n        <td>" + s.mode + "</td>\n        <!--<td>" + s.failTime + "</td>\n        <td>" + s.logPath + "</td>\n        <td>" + s.path + "</td>-->";
+        "<td>" + name + "&nbsp;" + status + "</td>\n        <td>" + id + "</td>\n        <td class=\"center-align\"><a class=\"modal-trigger\" href=\"#modal-" + s.id + "\"><i class=\"material-icons " + icolor + "\">info_outline</i></a></td>\n        <td>" + s.pid + "</td>\n        <td>" + addr + "</td>\n        <td>" + timeSince(Date.parse(s.startTime)) + "</td>\n        <td>" + s.mode + "</td>\n        <td>" + gname + "</td>\n        <!--<td>" + s.failTime + "</td>\n        <td>" + s.logPath + "</td>\n        <td>" + s.path + "</td>-->";
     row.appendChild(genModalService(r, s, id, color, addr));
     var td = document.createElement('td');
     td.className = "center-align";

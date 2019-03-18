@@ -276,6 +276,7 @@ function remotes(data: any): void {
                     <th>Address</td>
                     <th>Upime</td>
                     <th>Mode</td>
+                    <th>Group</td>
                     <th class="center-align">Restart</td>
                     <!--<th>Fail Time</td>
                     <th>Log Path</td>
@@ -396,9 +397,17 @@ function genServiceRow(r, s) {
         s.startTime = "0";
     }
 
-    let name = ""
+    let name = "";
     if (s.gmbhService != undefined){
         name = s.gmbhService.name;
+    }
+
+    let gname = "-";
+    if (s.gmbhService != undefined){
+        gname = s.gmbhService.groupName;
+        if(gname == "") {
+            gname = "-";
+        }
     }
 
     let row = document.createElement('tr');
@@ -410,6 +419,7 @@ function genServiceRow(r, s) {
         <td>${addr}</td>
         <td>${timeSince(Date.parse(s.startTime))}</td>
         <td>${s.mode}</td>
+        <td>${gname}</td>
         <!--<td>${s.failTime}</td>
         <td>${s.logPath}</td>
         <td>${s.path}</td>-->`;
