@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from intrigue.rpc import Bridge
 
 import json

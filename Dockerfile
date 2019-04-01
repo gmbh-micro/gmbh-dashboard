@@ -21,7 +21,8 @@ RUN mv ./gmbh-dashboard/requirements.txt /tmp/requirements.txt
 
 RUN pip3 install -r /tmp/requirements.txt
 
-RUN mv ./gmbh-dashboard/app /app
+RUN mkdir /app
+RUN mv ./gmbh-dashboard/app/* /app/
 WORKDIR /app
 
 EXPOSE 5001
