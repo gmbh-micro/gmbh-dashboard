@@ -90,6 +90,77 @@ $(chadr).click(()=>{
     }
 });
 
+addrContent.append(document.createElement("br"));
+addrContent.append(document.createElement("br"));
+
+let loaddr = document.createElement('a');
+loaddr.className = "chip";
+loaddr.innerText = "Use Localhost";
+addrContent.append(loaddr);
+
+$(loaddr).click(()=>{
+    console.log("local addr")
+    setDashboard();
+    let clb = "localhost:49500";
+    let ctrl = "localhost:59500";
+
+    retrieveData(clb,ctrl);
+
+    cabalServer = clb;
+    controlServer = ctrl;
+
+    Cookies.set('cbl',clb);
+    Cookies.set('ctrl',ctrl);
+
+    var instance = M.Modal.getInstance(addrModal);
+    instance.close();
+    console.log("local addr done")
+});
+
+let fromdkr = document.createElement('a');
+fromdkr.className = "chip";
+fromdkr.innerText = "Local Docker";
+addrContent.append(fromdkr);
+
+$(fromdkr).click(()=>{
+    setDashboard();
+    let clb = "host.docker.internal:49500";
+    let ctrl = "host.docker.internal:59500";
+
+    retrieveData(clb,ctrl);
+
+    cabalServer = clb;
+    controlServer = ctrl;
+
+    Cookies.set('cbl',clb);
+    Cookies.set('ctrl',ctrl);
+
+    var instance = M.Modal.getInstance(addrModal);
+    instance.close();
+});
+
+let cluster = document.createElement('a');
+cluster.className = "chip small";
+cluster.innerText = "Docker Cluster";
+addrContent.append(cluster);
+
+$(cluster).click(()=>{
+    setDashboard();
+    let clb = "node_0:49500";
+    let ctrl = "node_procm:59500";
+
+    retrieveData(clb,ctrl);
+
+    cabalServer = clb;
+    controlServer = ctrl;
+
+    Cookies.set('cbl',clb);
+    Cookies.set('ctrl',ctrl);
+
+    var instance = M.Modal.getInstance(addrModal);
+    instance.close();
+});
+
 addrModal.appendChild(addrContent);
     return addrModal;
 }
@@ -196,12 +267,12 @@ function gmbherror() {
     `;
 }
 
-function getService(parentID: string) {
+function getService(name: string) {
     //@ts-ignore
     for (let s in parsedServices) {
         //@ts-ignore
         let service = parsedServices[s];
-        if (service.parentID == parentID) {
+        if (service.name == name) {
             //@ts-ignore
             parsedServices[s] = {};
             return service;
@@ -368,7 +439,7 @@ function genLink(id: string) {
 // generates a row in the service table including the modal printout
 function genServiceRow(r, s) {
 
-    console.log(s);
+    console.log(r,s);
 
     let id = s.id
     if (id.length > 4) {
@@ -381,7 +452,8 @@ function genServiceRow(r, s) {
     }
     let status = `<span class="new badge ${color}" data-badge-caption="">${s.status}</span>`
 
-    let cabalService = getService(r.id);
+    // console.log(s.name);
+    let cabalService = getService(s.name);
     s.gmbhService = cabalService;
 
     let addr = "-";
@@ -404,7 +476,13 @@ function genServiceRow(r, s) {
 
     let gname = "-";
     if (s.gmbhService != undefined){
-        gname = s.gmbhService.groupName;
+        // gname = s.gmbhService.peerGroups;
+        if (s.gmbhService.peerGroups != "") {
+            gname = ""
+            for(let grp in s.gmbhService.peerGroups) {
+                gname += s.gmbhService.peerGroups[grp] + "<br>";
+            }
+        }
         if(gname == "") {
             gname = "-";
         }

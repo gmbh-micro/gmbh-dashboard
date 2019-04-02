@@ -160,3 +160,13 @@ nav .brand-logo {
     border-bottom: 1px solid black !important;
     box-shadow: 0 1px 0 0 black !important
   }
+
+.chip {
+    cursor: pointer;
+    height: 26px;
+    line-height: 26px;
+}
+
+.chip:hover {
+    background-color: #999999
+}

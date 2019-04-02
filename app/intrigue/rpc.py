@@ -32,7 +32,8 @@ class Bridge:
                 data["name"] = service.Name
                 data["address"] = service.Address
                 data["mode"] = service.Mode
-                data["groupName"] = service.GroupName
+                data["peerGroups"] = []
+                data["peerGroups"].extend(service.PeerGroups)
                 data["parentID"] = service.ParentID
                 ret.append(data)
 

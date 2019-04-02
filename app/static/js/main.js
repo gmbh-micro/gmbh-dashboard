@@ -57,6 +57,58 @@ function getAddress() {
             instance.close();
         }
     });
+    addrContent.append(document.createElement("br"));
+    addrContent.append(document.createElement("br"));
+    var loaddr = document.createElement('a');
+    loaddr.className = "chip";
+    loaddr.innerText = "Use Localhost";
+    addrContent.append(loaddr);
+    $(loaddr).click(function () {
+        console.log("local addr");
+        setDashboard();
+        var clb = "localhost:49500";
+        var ctrl = "localhost:59500";
+        retrieveData(clb, ctrl);
+        cabalServer = clb;
+        controlServer = ctrl;
+        Cookies.set('cbl', clb);
+        Cookies.set('ctrl', ctrl);
+        var instance = M.Modal.getInstance(addrModal);
+        instance.close();
+        console.log("local addr done");
+    });
+    var fromdkr = document.createElement('a');
+    fromdkr.className = "chip";
+    fromdkr.innerText = "Local Docker";
+    addrContent.append(fromdkr);
+    $(fromdkr).click(function () {
+        setDashboard();
+        var clb = "host.docker.internal:49500";
+        var ctrl = "host.docker.internal:59500";
+        retrieveData(clb, ctrl);
+        cabalServer = clb;
+        controlServer = ctrl;
+        Cookies.set('cbl', clb);
+        Cookies.set('ctrl', ctrl);
+        var instance = M.Modal.getInstance(addrModal);
+        instance.close();
+    });
+    var cluster = document.createElement('a');
+    cluster.className = "chip small";
+    cluster.innerText = "Docker Cluster";
+    addrContent.append(cluster);
+    $(cluster).click(function () {
+        setDashboard();
+        var clb = "node_0:49500";
+        var ctrl = "node_procm:59500";
+        retrieveData(clb, ctrl);
+        cabalServer = clb;
+        controlServer = ctrl;
+        Cookies.set('cbl', clb);
+        Cookies.set('ctrl', ctrl);
+        var instance = M.Modal.getInstance(addrModal);
+        instance.close();
+    });
     addrModal.appendChild(addrContent);
     return addrModal;
 }
@@ -143,12 +195,12 @@ function gmbherror() {
     content.innerHTML =
         "<h3>Dashboard</h3>\n    <h5>could not reach gmbh</h5>\n    <br>\n    <a class=\"collection-item modal-trigger\" href=\"#modal-addr\" id=\"change-addresses\" class=\"collection-item\">Change Addresses</a>\n    ";
 }
-function getService(parentID) {
+function getService(name) {
     //@ts-ignore
     for (var s in parsedServices) {
         //@ts-ignore
         var service = parsedServices[s];
-        if (service.parentID == parentID) {
+        if (service.name == name) {
             //@ts-ignore
             parsedServices[s] = {};
             return service;
@@ -265,7 +317,7 @@ function genLink(id) {
 // genServiceRow
 // generates a row in the service table including the modal printout
 function genServiceRow(r, s) {
-    console.log(s);
+    console.log(r, s);
     var id = s.id;
     if (id.length > 4) {
         id = id.substring(5);
@@ -275,7 +327,8 @@ function genServiceRow(r, s) {
         color = "green";
     }
     var status = "<span class=\"new badge " + color + "\" data-badge-caption=\"\">" + s.status + "</span>";
-    var cabalService = getService(r.id);
+    // console.log(s.name);
+    var cabalService = getService(s.name);
     s.gmbhService = cabalService;
     var addr = "-";
     if (cabalService != null) {
@@ -294,7 +347,13 @@ function genServiceRow(r, s) {
     }
     var gname = "-";
     if (s.gmbhService != undefined) {
-        gname = s.gmbhService.groupName;
+        // gname = s.gmbhService.peerGroups;
+        if (s.gmbhService.peerGroups != "") {
+            gname = "";
+            for (var grp in s.gmbhService.peerGroups) {
+                gname += s.gmbhService.peerGroups[grp] + "<br>";
+            }
+        }
         if (gname == "") {
             gname = "-";
         }
