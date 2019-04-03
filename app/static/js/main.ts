@@ -61,107 +61,42 @@ function getAddress() {
     </div>
 </div>
 `;
-let chadr = document.createElement('a');
-chadr.className = "waves-effect waves-light btn-small grey darken-2";
-chadr.innerText = "Change";
-addrContent.append(chadr);
+    let chadr = document.createElement('a');
+    chadr.className = "waves-effect waves-light btn-small grey darken-2";
+    chadr.innerText = "Change";
+    addrContent.append(chadr);
 
-$(chadr).click(()=>{
-    setDashboard();
+    $(chadr).click(()=>{
+        setDashboard();
 
-    let clb = $('#CblServer').val();
-    let ctrl = $('#CtrlServer').val()
+        let clb = $('#CblServer').val();
+        let ctrl = $('#CtrlServer').val()
 
-    if (clb == "" || ctrl == ""){
-        M.toast({html: 'Server URL\'s cannot be empty'});
+        if (clb == "" || ctrl == ""){
+            M.toast({html: 'Server URL\'s cannot be empty'});
 
-    } else {
+        } else {
 
-        retrieveData(clb,ctrl);
+            retrieveData(clb,ctrl);
 
-        cabalServer = clb;
-        controlServer = ctrl;
+            cabalServer = clb;
+            controlServer = ctrl;
 
-        Cookies.set('cbl',clb);
-        Cookies.set('ctrl',ctrl);
+            Cookies.set('cbl',clb);
+            Cookies.set('ctrl',ctrl);
 
-        var instance = M.Modal.getInstance(addrModal);
-        instance.close();
-    }
-});
+            var instance = M.Modal.getInstance(addrModal);
+            instance.close();
+        }
+    });
 
-addrContent.append(document.createElement("br"));
-addrContent.append(document.createElement("br"));
+    addrContent.append(document.createElement("br"));
+    addrContent.append(document.createElement("br"));
+    addrContent.append(change_address("Localhost", "localhost:49500", "localhost:59500", addrModal));
+    addrContent.append(change_address("Local Docker", "host.docker.internal:49500", "host.docker.internal:59500", addrModal));
+    addrContent.append(change_address("Cluster Docker", "node_0:49500", "node_procm:59500", addrModal));
 
-let loaddr = document.createElement('a');
-loaddr.className = "chip";
-loaddr.innerText = "Use Localhost";
-addrContent.append(loaddr);
-
-$(loaddr).click(()=>{
-    console.log("local addr")
-    setDashboard();
-    let clb = "localhost:49500";
-    let ctrl = "localhost:59500";
-
-    retrieveData(clb,ctrl);
-
-    cabalServer = clb;
-    controlServer = ctrl;
-
-    Cookies.set('cbl',clb);
-    Cookies.set('ctrl',ctrl);
-
-    var instance = M.Modal.getInstance(addrModal);
-    instance.close();
-    console.log("local addr done")
-});
-
-let fromdkr = document.createElement('a');
-fromdkr.className = "chip";
-fromdkr.innerText = "Local Docker";
-addrContent.append(fromdkr);
-
-$(fromdkr).click(()=>{
-    setDashboard();
-    let clb = "host.docker.internal:49500";
-    let ctrl = "host.docker.internal:59500";
-
-    retrieveData(clb,ctrl);
-
-    cabalServer = clb;
-    controlServer = ctrl;
-
-    Cookies.set('cbl',clb);
-    Cookies.set('ctrl',ctrl);
-
-    var instance = M.Modal.getInstance(addrModal);
-    instance.close();
-});
-
-let cluster = document.createElement('a');
-cluster.className = "chip small";
-cluster.innerText = "Docker Cluster";
-addrContent.append(cluster);
-
-$(cluster).click(()=>{
-    setDashboard();
-    let clb = "node_0:49500";
-    let ctrl = "node_procm:59500";
-
-    retrieveData(clb,ctrl);
-
-    cabalServer = clb;
-    controlServer = ctrl;
-
-    Cookies.set('cbl',clb);
-    Cookies.set('ctrl',ctrl);
-
-    var instance = M.Modal.getInstance(addrModal);
-    instance.close();
-});
-
-addrModal.appendChild(addrContent);
+    addrModal.appendChild(addrContent);
     return addrModal;
 }
 
@@ -259,12 +194,16 @@ function gmbherror() {
         console.log("error=could not get main-content div")
         return;
     }
+
     content.innerHTML =
     `<h3>Dashboard</h3>
     <h5>could not reach gmbh</h5>
     <br>
     <a class="collection-item modal-trigger" href="#modal-addr" id="change-addresses" class="collection-item">Change Addresses</a>
-    `;
+    <br>`;
+    content.append(change_address("Localhost", "localhost:49500", "localhost:59500", undefined));
+    content.append(change_address("Local Docker", "host.docker.internal:49500", "host.docker.internal:59500", undefined));
+    content.append(change_address("Cluster Docker", "node_0:49500", "node_procm:59500", undefined));
 }
 
 function getService(name: string) {
@@ -297,8 +236,11 @@ function remotes(data: any): void {
         <h5>could not reach gmbh</h5>
         <br>
         <a class="collection-item modal-trigger" href="#modal-addr" id="change-addresses" class="collection-item">Change Addresses</a>
-        `;
-
+        <br><br>`;
+        content.append(change_address("Localhost", "localhost:49500", "localhost:59500", undefined));
+        content.append(change_address("Local Docker", "host.docker.internal:49500", "host.docker.internal:59500", undefined));
+        content.append(change_address("Cluster Docker", "node_0:49500", "node_procm:59500", undefined));
+    
         return;
     }
 
@@ -380,7 +322,10 @@ function setDashboard(): void {
     <div class="progress">
         <div class="indeterminate grey darken-3"></div>
     </div>
-    `;
+    <br><br>`;
+    content.append(change_address("Localhost", "localhost:49500", "localhost:59500", undefined));
+    content.append(change_address("Local Docker", "host.docker.internal:49500", "host.docker.internal:59500", undefined));
+    content.append(change_address("Cluster Docker", "node_0:49500", "node_procm:59500", undefined));
 }
 
 // Sky Sanders, stackoverflow; July 5, 2010
@@ -709,4 +654,33 @@ function getCookie(cname) {
       }
     }
     return "";
-  }
+}
+
+function change_address(name, cabal, control, modal) {
+
+    let a = document.createElement('a');
+    a.className = "chip";
+    a.innerHTML = "Use " + name;
+    
+    $(a).click(()=>{
+        console.log("changing addresses - preset " + name);
+        
+        setDashboard();
+        retrieveData(cabal,control);
+    
+        cabalServer = cabal;
+        controlServer = control;
+    
+        Cookies.set('cbl',cabal);
+        Cookies.set('ctrl',control);
+    
+        if(modal != undefined) {
+            var instance = M.Modal.getInstance(modal);
+            instance.close();
+        } else {
+            location.reload();
+        }
+    });
+
+    return a;
+}

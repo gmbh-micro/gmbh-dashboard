@@ -8,23 +8,18 @@ RUN apt-get update && \
     libssl-dev \
     libffi-dev \
     python3-dev \
-    nano \
     bash \
     git \
     supervisor && \
     useradd -ms /bin/bash nginx
 
-RUN git clone https://github.com/gmbh-micro/gmbh-dashboard.git
+RUN git clone https://github.com/gmbh-micro/gmbh-dashboard.git \
+    && mv ./gmbh-dashboard/conf/supervisord.conf /etc/supervisord.conf \
+    && mv ./gmbh-dashboard/requirements.txt /tmp/requirements.txt \
+    && pip3 install -r /tmp/requirements.txt \
+    && mkdir /app \
+    && mv ./gmbh-dashboard/app/* /app/
 
-RUN mv ./gmbh-dashboard/conf/supervisord.conf /etc/supervisord.conf
-RUN mv ./gmbh-dashboard/requirements.txt /tmp/requirements.txt
-
-RUN pip3 install -r /tmp/requirements.txt
-
-RUN mkdir /app
-RUN mv ./gmbh-dashboard/app/* /app/
 WORKDIR /app
-
 EXPOSE 5001
-
 CMD ["/usr/bin/supervisord"]

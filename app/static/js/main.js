@@ -59,56 +59,9 @@ function getAddress() {
     });
     addrContent.append(document.createElement("br"));
     addrContent.append(document.createElement("br"));
-    var loaddr = document.createElement('a');
-    loaddr.className = "chip";
-    loaddr.innerText = "Use Localhost";
-    addrContent.append(loaddr);
-    $(loaddr).click(function () {
-        console.log("local addr");
-        setDashboard();
-        var clb = "localhost:49500";
-        var ctrl = "localhost:59500";
-        retrieveData(clb, ctrl);
-        cabalServer = clb;
-        controlServer = ctrl;
-        Cookies.set('cbl', clb);
-        Cookies.set('ctrl', ctrl);
-        var instance = M.Modal.getInstance(addrModal);
-        instance.close();
-        console.log("local addr done");
-    });
-    var fromdkr = document.createElement('a');
-    fromdkr.className = "chip";
-    fromdkr.innerText = "Local Docker";
-    addrContent.append(fromdkr);
-    $(fromdkr).click(function () {
-        setDashboard();
-        var clb = "host.docker.internal:49500";
-        var ctrl = "host.docker.internal:59500";
-        retrieveData(clb, ctrl);
-        cabalServer = clb;
-        controlServer = ctrl;
-        Cookies.set('cbl', clb);
-        Cookies.set('ctrl', ctrl);
-        var instance = M.Modal.getInstance(addrModal);
-        instance.close();
-    });
-    var cluster = document.createElement('a');
-    cluster.className = "chip small";
-    cluster.innerText = "Docker Cluster";
-    addrContent.append(cluster);
-    $(cluster).click(function () {
-        setDashboard();
-        var clb = "node_0:49500";
-        var ctrl = "node_procm:59500";
-        retrieveData(clb, ctrl);
-        cabalServer = clb;
-        controlServer = ctrl;
-        Cookies.set('cbl', clb);
-        Cookies.set('ctrl', ctrl);
-        var instance = M.Modal.getInstance(addrModal);
-        instance.close();
-    });
+    addrContent.append(change_address("Localhost", "localhost:49500", "localhost:59500", addrModal));
+    addrContent.append(change_address("Local Docker", "host.docker.internal:49500", "host.docker.internal:59500", addrModal));
+    addrContent.append(change_address("Cluster Docker", "node_0:49500", "node_procm:59500", addrModal));
     addrModal.appendChild(addrContent);
     return addrModal;
 }
@@ -193,7 +146,10 @@ function gmbherror() {
         return;
     }
     content.innerHTML =
-        "<h3>Dashboard</h3>\n    <h5>could not reach gmbh</h5>\n    <br>\n    <a class=\"collection-item modal-trigger\" href=\"#modal-addr\" id=\"change-addresses\" class=\"collection-item\">Change Addresses</a>\n    ";
+        "<h3>Dashboard</h3>\n    <h5>could not reach gmbh</h5>\n    <br>\n    <a class=\"collection-item modal-trigger\" href=\"#modal-addr\" id=\"change-addresses\" class=\"collection-item\">Change Addresses</a>\n    <br>";
+    content.append(change_address("Localhost", "localhost:49500", "localhost:59500", undefined));
+    content.append(change_address("Local Docker", "host.docker.internal:49500", "host.docker.internal:59500", undefined));
+    content.append(change_address("Cluster Docker", "node_0:49500", "node_procm:59500", undefined));
 }
 function getService(name) {
     //@ts-ignore
@@ -219,7 +175,10 @@ function remotes(data) {
     catch (_a) {
         console.log("could not parse results");
         content.innerHTML =
-            "<h3>Dashboard</h3>\n        <h5>could not reach gmbh</h5>\n        <br>\n        <a class=\"collection-item modal-trigger\" href=\"#modal-addr\" id=\"change-addresses\" class=\"collection-item\">Change Addresses</a>\n        ";
+            "<h3>Dashboard</h3>\n        <h5>could not reach gmbh</h5>\n        <br>\n        <a class=\"collection-item modal-trigger\" href=\"#modal-addr\" id=\"change-addresses\" class=\"collection-item\">Change Addresses</a>\n        <br><br>";
+        content.append(change_address("Localhost", "localhost:49500", "localhost:59500", undefined));
+        content.append(change_address("Local Docker", "host.docker.internal:49500", "host.docker.internal:59500", undefined));
+        content.append(change_address("Cluster Docker", "node_0:49500", "node_procm:59500", undefined));
         return;
     }
     buildNav();
@@ -265,7 +224,10 @@ function setDashboard() {
         return;
     }
     content.innerHTML =
-        "<h3>Dashboard</h3>\n    <h5>contacting gmbh</h5>\n    <div class=\"progress\">\n        <div class=\"indeterminate grey darken-3\"></div>\n    </div>\n    ";
+        "<h3>Dashboard</h3>\n    <h5>contacting gmbh</h5>\n    <div class=\"progress\">\n        <div class=\"indeterminate grey darken-3\"></div>\n    </div>\n    <br><br>";
+    content.append(change_address("Localhost", "localhost:49500", "localhost:59500", undefined));
+    content.append(change_address("Local Docker", "host.docker.internal:49500", "host.docker.internal:59500", undefined));
+    content.append(change_address("Cluster Docker", "node_0:49500", "node_procm:59500", undefined));
 }
 // Sky Sanders, stackoverflow; July 5, 2010
 // @ts-ignore
@@ -457,4 +419,26 @@ function getCookie(cname) {
         }
     }
     return "";
+}
+function change_address(name, cabal, control, modal) {
+    var a = document.createElement('a');
+    a.className = "chip";
+    a.innerHTML = "Use " + name;
+    $(a).click(function () {
+        console.log("changing addresses - preset " + name);
+        setDashboard();
+        retrieveData(cabal, control);
+        cabalServer = cabal;
+        controlServer = control;
+        Cookies.set('cbl', cabal);
+        Cookies.set('ctrl', control);
+        if (modal != undefined) {
+            var instance = M.Modal.getInstance(modal);
+            instance.close();
+        }
+        else {
+            location.reload();
+        }
+    });
+    return a;
 }
